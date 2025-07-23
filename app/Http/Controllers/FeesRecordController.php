@@ -5,6 +5,10 @@ use App\Models\FeesRecord;
 use App\Models\Installment;
 use App\Models\StudentRecord;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth; // To get institute info if needed
+use App\Models\Setting;
+
 
 class FeesRecordController extends Controller
 {
@@ -120,4 +124,45 @@ class FeesRecordController extends Controller
 
         return redirect()->route('fees-records.index')->with('success', 'Record deleted successfully.');
     }
+
+
+
+    // Add this method inside your FeesRecordController class
+
+        // In app/Http/Controllers/FeesRecordController.php
+
+            public function downloadReceipt($id)
+            {
+                $installment = Installment::with('feesRecord.student')->findOrFail($id);
+
+                if ($installment->status !== 'Paid') {
+                    return redirect()->back()->with('error', 'Receipt is not available for unpaid installments.');
+                }
+
+                if (Auth::guard('student')->check() && $installment->feesRecord->student_id !== Auth::guard('student')->id()) {
+                    abort(403, 'UNAUTHORIZED ACTION.');
+                }
+
+                // 🔄 Fetch settings dynamically
+                $setting = \App\Models\Setting::first();
+
+                $data = [
+                    'installment' => $installment,
+                    'student' => $installment->feesRecord->student,
+                    'feesRecord' => $installment->feesRecord,
+                    'receipt_no' => 'RCPT-' . str_pad($installment->id, 5, '0', STR_PAD_LEFT),
+                    'issue_date' => now()->format('d M, Y'),
+                    'institute_name' => $setting->institute_name ?? 'Your Classes',
+                    'institute_address' => $setting->institute_address ?? 'N/A',
+                    'institute_logo' => public_path('uploads/' . ($setting->institute_logo ?? 'default.png')),
+                ];
+
+                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('receipts.invoice', $data);
+
+                $fileName = 'Receipt-' . $data['receipt_no'] . '-' . $data['student']->first_name . '.pdf';
+                return $pdf->download($fileName);
+            }
+
+
+
 }

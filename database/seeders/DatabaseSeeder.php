@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
          $this->call([
             StudentSeeder::class,
         ]);
+        
         $this->call(BatchSeeder::class);
         User::factory()->create([
             'name' => 'Test User',

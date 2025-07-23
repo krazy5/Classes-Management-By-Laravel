@@ -96,8 +96,208 @@
                 </div>
             </a>
         </div>
+
+
+        {{-- Broadcast Message Card --}}
+        <div class="col-xl-3 col-md-6 mt-4">
+            <a href="{{ route('broadcast.create') }}" class="text-decoration-none">
+                <div class="card stat-card bg-gradient-primary h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Broadcast</h5>
+                        <p class="card-text">Send to Batch</p>
+                        <div class="icon"><i class="fas fa-bullhorn"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+         {{-- Notification Card --}}
+        <div class="col-xl-3 col-md-6 mt-4">
+            <a href="{{route('notifications.index')}}" class="text-decoration-none">
+                <div class="card stat-card bg-gradient-secondary h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Notificaitons</h5>
+                        <p class="card-text">{{ $totalAttendance ?? '--' }}</p>
+                        <div class="icon"><i class="fas fa-clipboard-check"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Settings Card --}}
+<div class="col-xl-3 col-md-6 mt-4">
+    <a href="{{ route('settings.edit') }}" class="text-decoration-none">
+        <div class="card stat-card bg-gradient-primary h-100">
+            <div class="card-body">
+                <h5 class="card-title">Settings</h5>
+                <p class="card-text">Manage Site Config</p>
+                <div class="icon"><i class="fas fa-cogs"></i></div>
+            </div>
+        </div>
+    </a>
+</div>
+        <!-- Timetable Card -->
+        <div class="col-xl-3 col-md-6 mt-4">
+            <a href="{{ route('timetables.index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-gradient-info h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Timetables</h5>
+                        <p class="card-text">{{ $totalTimetables ?? '--' }}</p>
+                        <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Events Card -->
+        <div class="col-xl-3 col-md-6 mt-4">
+            <a href="{{ route('events.index') }}" class="text-decoration-none">
+                <div class="card stat-card bg-gradient-success h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Events</h5>
+                        <p class="card-text">{{ $totalEvents ?? '--' }}</p>
+                        <div class="icon"><i class="fas fa-calendar"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+
+    </div>
+{{-- Paste this code inside views/admin/index.blade.php --}}
+{{-- A good location is after the first closing </div> of the summary cards row --}}
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card chart-card h-100">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-birthday-cake me-2 text-primary"></i>
+                <h5 class="mb-0">Today's Birthdays 🎂</h5>
+            </div>
+            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                @forelse($todaysBirthdays as $student)
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ $student->photo ? asset('storage/'.$student->photo) : asset('images/default-avatar.png') }}" alt="photo" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; margin-right: 15px;">
+                        <div>
+                            <h6 class="mb-0">{{ $student->first_name }} {{ $student->last_name }}</h6>
+                            <small class="text-muted">Class: {{ $student->std ?? 'N/A' }}</small>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center text-muted d-flex align-items-center justify-content-center h-100">
+                        <p class="mb-0">No student birthdays today.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
     </div>
 
+    <div class="col-lg-6">
+        <div class="card chart-card h-100">
+            <div class="card-header d-flex align-items-center">
+                <i class="fas fa-calendar-check me-2 text-success"></i>
+                <h5 class="mb-0">Upcoming Birthdays</h5>
+            </div>
+            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                @forelse($upcomingBirthdays as $student)
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ $student->photo ? asset('storage/'.$student->photo) : asset('images/default-avatar.png') }}" alt="photo" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; margin-right: 15px;">
+                            <div>
+                                <h6 class="mb-0">{{ $student->first_name }} {{ $student->last_name }}</h6>
+                                <small class="text-muted">Class: {{ $student->std ?? 'N/A' }}</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-light text-dark fs-6">{{ \Carbon\Carbon::parse($student->dob)->format('d M') }}</span>
+                    </div>
+                @empty
+                    <div class="text-center text-muted d-flex align-items-center justify-content-center h-100">
+                        <p class="mb-0">No upcoming birthdays found.</p>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="col-lg-6 mt-4">
+    <div class="card chart-card h-100">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <div>
+                <i class="fas fa-calendar-alt me-2 text-info"></i>
+                <h5 class="mb-0">📅 Upcoming Events</h5>
+            </div>
+            <a href="{{ route('events.create') }}" class="btn btn-sm btn-primary">+ Add Event</a>
+        </div>
+
+        <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+            @forelse($upcomingEvents as $event)
+                <div class="mb-3">
+                    <h6 class="mb-1 text-primary">{{ $event->title }}</h6>
+                    <small class="text-muted">
+                        {{ \Carbon\Carbon::parse($event->event_date)->format('d M, Y') }}
+                        | {{ \Carbon\Carbon::parse($event->start_time)->format('h:i A') }} - 
+                          {{ \Carbon\Carbon::parse($event->end_time)->format('h:i A') }}
+                        @if($event->batch)
+                            | Batch: {{ $event->batch->batch_name }}
+                        @endif
+                    </small>
+                    <p class="mt-1 mb-0">{{ $event->description }}</p>
+                </div>
+            @empty
+                <div class="text-muted">No upcoming events.</div>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+        <div class="card chart-card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div>
+                    <i class="fas fa-clock me-2 text-secondary"></i>
+                    <h5 class="mb-0">🕒 Latest Timetables</h5>
+                </div>
+                <a href="{{ route('timetables.create') }}" class="btn btn-sm btn-primary">+ Add Timetable</a>
+            </div>
+            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                @forelse($timetables as $tt)
+                    <div class="mb-2">
+                        <strong>{{ $tt->subject ?? '-' }}</strong>
+                        @if ($tt->batch)
+                            <span class="text-muted"> (Batch: {{ $tt->batch->batch_name ?? '-' }}) </span>
+                        @endif
+                        <div>
+                            <small>
+                                {{ $tt->day_of_week }} | 
+                                {{ \Carbon\Carbon::parse($tt->start_time)->format('h:i A') }} - 
+                                {{ \Carbon\Carbon::parse($tt->end_time)->format('h:i A') }} 
+                                @if($tt->teacher_name)
+                                    | {{ $tt->teacher_name }}
+                                @endif
+                            </small>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-muted">No timetables available.</div>
+                @endforelse
+            </div>
+        </div>
+
+<!-- Then list a few upcoming/current timetable entries. -->
+@forelse($timetables as $tt)
+    <div>{{ $tt->title ?? $tt->subject }} - {{ \Carbon\Carbon::parse($tt->date)->format('d M, Y') }}</div>
+@empty
+    <div class="text-muted">No timetables available.</div>
+@endforelse
+
+
+
+
+
+<div class="row g-4 mt-4">
     <!-- Charts Section -->
     <div class="row g-4 mt-4">
         <div class="col-lg-7">
@@ -128,6 +328,11 @@
             </div>
         </div>
     </div>
+
+
+    
+
+
 </div>
 @endsection
 

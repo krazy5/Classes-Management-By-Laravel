@@ -20,4 +20,14 @@ class Admin extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function sentMessages(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(\App\Models\Message::class, 'sender');
+    }
+
+    public function receivedMessages(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(\App\Models\Message::class, 'recipient');
+    }
 }

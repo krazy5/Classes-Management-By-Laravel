@@ -8,21 +8,55 @@
     <!-- Bootstrap CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {{-- Adding Font Awesome for icons and Google Fonts for better typography --}}
     @push('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <style>
         
+
+        /* Profile Section Styles */
+.sidebar-profile {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 20px;
+}
+
+.sidebar-profile .profile-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%; /* Makes the image round */
+    object-fit: cover; /* Prevents image distortion */
+    border: 3px solid #f0f0f0;
+}
+
+.sidebar-profile .profile-name {
+    color: #343a40;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+.sidebar-profile .profile-title {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+
         .sidebar {
             min-height: 100vh;
-            background-color: #343a40;
+            background-color: #ffffff;
         }
         .sidebar a, .sidebar .dropdown-toggle {
-            color: white;
+            color: rgb(5, 0, 0);
             text-decoration: none;
         }
         .sidebar .nav-link:hover, .sidebar .dropdown-toggle:hover {
-            background-color: #495057;
+            background-color: #a4e77b;
         }
         .card-title {
             font-size: 1.25rem;
@@ -113,6 +147,91 @@
     @stack('styles')
 </head>
 <body>
+@php
+  
+
+    $guard = null;
+    if (Auth::guard('admin')->check()) {
+        $guard = 'admin';
+    } elseif (Auth::guard('student')->check()) {
+        $guard = 'student';
+    }
+@endphp
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4 d-none d-md-flex justify-content-between">
+    <div>
+        <a class="navbar-brand fw-bold" href="#">MAK Tutorials</a>
+    </div>
+    
+    <ul class="navbar-nav flex-row align-items-center">
+        @php
+            $navNotifications = collect();
+            $unreadCount = 0;
+
+            if (auth()->guard('student')->check()) {
+                $student = auth()->guard('student')->user();
+
+                $navNotifications = \App\Models\Notification::where('is_active', true)
+                    ->where(function ($query) use ($student) {
+                        $query->where('student_id', $student->id)
+                            ->orWhereNull('student_id')
+                            ->orWhere('audience', 'student')
+                            ->orWhere('audience', 'all');
+                    })
+                    ->latest()
+                    ->take(5)
+                    ->get();
+
+                $unreadCount = $navNotifications->where('is_read', false)->count();
+            }
+        @endphp
+
+
+        @if($guard === 'student')
+        <li class="nav-item dropdown me-3">
+            <a class="nav-link position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-bell fs-5 text-white"></i>
+                @if($unreadCount > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $unreadCount }}
+                    </span>
+                @endif
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="width: 300px;">
+                <li class="dropdown-header">Notifications</li>
+                @forelse($navNotifications as $notify)
+                    <li>
+                        <a href="{{ route('notifications.read', $notify->id) }}" class="dropdown-item d-flex justify-content-between align-items-start">
+                            <div class="me-2">
+                                <strong>{{ $notify->title }}</strong><br>
+                                <small class="text-muted">{{ Str::limit($notify->message, 40) }}</small>
+                            </div>
+                            @if(!$notify->is_read)
+                                <span class="badge bg-success ms-2">New</span>
+                            @endif
+                        </a>
+                    </li>
+                @empty
+                    <li><span class="dropdown-item text-muted">No notifications</span></li>
+                @endforelse
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a href="{{ route('student.dashboard') }}" class="dropdown-item text-center text-primary">View All</a>
+                </li>
+            </ul>
+        </li>
+        @endif
+
+        <li class="nav-item">
+            <a class="nav-link text-white" href="#">
+                <i class="bi bi-person-circle fs-5"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Mobile toggle button -->
     <nav class="navbar navbar-dark bg-dark d-md-none">
@@ -122,6 +241,12 @@
             </button>
         </div>
     </nav>
+
+
+    <!-- putting the bell icon -->
+
+    
+
 
     <div class="container-fluid">
         <div class="row">

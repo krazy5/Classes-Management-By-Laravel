@@ -175,4 +175,49 @@
 @endif
 <!-- END: Separate Attachment Delete Section -->
 
+{{-- PASTE THIS CODE AT THE BOTTOM OF students/edit.blade.php --}}
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Conversation with {{ $student->first_name }}</h5>
+    </div>
+    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+        @forelse($messages as $message)
+            @if($message->sender_type == 'App\Models\Admin')
+                {{-- Message from Admin (Right side) --}}
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="p-3 rounded bg-primary text-white" style="max-width: 70%;">
+                        <p class="mb-1">{{ $message->body }}</p>
+                        <small class="d-block text-end text-light">{{ $message->created_at->format('d M, h:i A') }}</small>
+                    </div>
+                </div>
+            @else
+                {{-- Message from Student (Left side) --}}
+                <div class="d-flex justify-content-start mb-3">
+                    <div class="p-3 rounded bg-light" style="max-width: 70%;">
+                        <p class="mb-1">{{ $message->body }}</p>
+                        <small class="d-block text-muted">{{ $message->created_at->format('d M, h:i A') }}</small>
+                    </div>
+                </div>
+            @endif
+        @empty
+            <p class="text-center text-muted">No messages yet.</p>
+        @endforelse
+    </div>
+    <div class="card-footer">
+        {{-- The Form to Send a New Message --}}
+        <form method="POST" action="{{ route('messages.store') }}">
+            @csrf
+            
+            {{-- Hidden fields to identify the recipient --}}
+            <input type="hidden" name="recipient_id" value="{{ $student->id }}">
+            <input type="hidden" name="recipient_type" value="App\Models\StudentRecord">
+            
+            <div class="input-group">
+                <textarea name="body" class="form-control" placeholder="Type your message..." required rows="1"></textarea>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

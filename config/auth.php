@@ -42,7 +42,7 @@ return [
         ],
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admins', // <- this must match the provider name you define below
+            'provider' => 'admin', // <- this must match the provider name you define below
         ],
         'student' => [
             'driver' => 'session',
@@ -72,7 +72,7 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-        'admins' => [
+        'admin' => [
             'driver' => 'eloquent',
              'model' => App\Models\Admin::class,
         ],

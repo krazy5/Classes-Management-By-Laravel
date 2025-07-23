@@ -44,5 +44,15 @@ class StudentRecord extends Authenticatable
             return $this->hasOne(FeesRecord::class, 'student_id', 'id');
         }
 
+        // Add this method
+        public function sentMessages(): \Illuminate\Database\Eloquent\Relations\MorphMany
+        {
+            return $this->morphMany(\App\Models\Message::class, 'sender');
+        }
+
+        public function receivedMessages(): \Illuminate\Database\Eloquent\Relations\MorphMany
+        {
+            return $this->morphMany(\App\Models\Message::class, 'recipient');
+        }
 
 }

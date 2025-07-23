@@ -6,15 +6,48 @@
 
 
 @section('content')
+
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    @foreach($notifications->where('is_read', false) as $notification)
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header bg-primary text-white">
+                <strong class="me-auto">{{ $notification->title }}</strong>
+                <small>Just now</small>
+                <a href="{{ route('notifications.read', $notification->id) }}" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></a>
+            </div>
+            <div class="toast-body">
+                {{ $notification->message }}
+            </div>
+        </div>
+    @endforeach
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+        var toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl).show();
+        });
+    });
+</script>
+
+
+
 <div class="container-fluid p-4">
+
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="dashboard-heading">👋 Welcome, {{ Auth::guard('student')->user()->first_name }}!</h2>
         <button class="btn btn-light shadow-sm">
             <i class="fas fa-calendar-alt me-2"></i> Today: {{ now()->format('d F, Y') }}
         </button>
+
+        
     </div>
 
     <div class="row g-4 mb-4">
+        
         <!-- Profile Info Card -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm">
@@ -30,12 +63,22 @@
                         <a href="{{ route('student.editProfile') }}" class="btn btn-outline-primary">
                             <i class="fas fa-user-edit me-1"></i> Edit Profile
                         </a>
+                        {{-- ✅ ADD THIS NEW BUTTON --}}
+                        <a href="{{ route('student.messages.index') }}" class="btn btn-outline-dark">
+                            <i class="fas fa-inbox me-1"></i> View Messages
+                        </a>
                         <a href="{{ route('student.fees.details', ['id' => Auth::guard('student')->user()->id]) }}" class="btn btn-outline-success">
 
                             <i class="fas fa-file-invoice-dollar me-1"></i> View Fees Details
                         </a>
                         <a href="{{ route('student.attendance.summary',['id' => Auth::guard('student')->user()->id]) }}" class="btn btn-outline-info">
                             <i class="fas fa-calendar-check me-1"></i> View Attendance
+                        </a>
+                        <a href="{{ route('student.events',['id' => Auth::guard('student')->user()->id]) }}" class="btn btn-outline-info">
+                            <i class="fas fa-calendar-check me-1"></i> View events
+                        </a>
+                        <a href="{{ route('student.timetables',['id' => Auth::guard('student')->user()->id]) }}" class="btn btn-outline-info">
+                            <i class="fas fa-calendar-check me-1"></i> View Timetable
                         </a>
                     </div>
                 </div>
@@ -53,7 +96,9 @@
                     <p><strong>School/College:</strong> {{ Auth::guard('student')->user()->school_college }}</p>
                 </div>
             </div>
+            
         </div>
+        
     </div>
 
     <!-- Fees Cards -->
@@ -97,7 +142,33 @@
             </ul>
         </div>
     </div>
+
+
+    
+
 </div>
+
+<ul class="list-group">
+    @foreach($notifications as $notification)
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <a href="{{ route('notifications.read', $notification->id) }}" style="text-decoration:none;">
+                    <strong>{{ $notification->title }}</strong><br>
+                    {{ $notification->message }}
+                </a>
+            </div>
+            @if($notification->is_read)
+                <span class="badge bg-secondary">Read</span>
+            @else
+                <span class="badge bg-success">New</span>
+            @endif
+        </li>
+    @endforeach
+</ul>
+
+
+
+
 @endsection
 
 
