@@ -28,27 +28,32 @@
 
                     $validated = $request->validate([
                         'first_name' => 'required|string|max:100',
-                        'last_name' => 'nullable|string|max:100',
-                        'email' => 'nullable|email|max:100',
-                        'mobile_no' => 'nullable|string|max:15',
-                        'photo' => 'nullable|image|max:2048', // 2MB
+                        'last_name'  => 'nullable|string|max:100',
+                        'email'      => 'nullable|email|max:100',
+                        'mobile_no'  => 'nullable|string|max:15',
+                        'photo'      => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Added mimes for better validation
                     ]);
 
-                    $student->fill($validated);
+                    // Update text fields
+                    $student->update($validated);
 
+                    // Handle the file upload
                     if ($request->hasFile('photo')) {
-                        // Delete old photo
-                        if ($student->photo && Storage::exists($student->photo)) {
-                            Storage::delete($student->photo);
+                        // 1. Delete the old photo if it exists
+                        if ($student->photo) {
+                            Storage::disk('public')->delete($student->photo);
                         }
 
-                        $student->photo = $request->file('photo')->store('student_photos');
+                        // 2. Store the new photo in the public disk
+                        $path = $request->file('photo')->store('student_photos', 'public');
+                        
+                        // 3. Update the photo path in the database
+                        $student->photo = $path;
+                        $student->save();
                     }
 
-                    $student->save();
-
-                    return redirect()->route('student.editProfile')->with('success', 'Profile updated successfully.');  
-                }   
+                    return redirect()->route('student.editProfile')->with('success', 'Profile updated successfully.');
+                }
 
                 // Show specific record and its installments=================================================================
                 public function showFeesProfile($id)

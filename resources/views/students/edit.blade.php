@@ -25,10 +25,10 @@
             <input type="file" name="photo" class="form-control">
         </div>
 
-        <div class="mb-3">
+       <!-- <div class="mb-3">
             <label>Attachment (optional)</label>
             <input type="file" name="attachment" class="form-control">
-        </div>
+        </div>  -->
 
         <div class="mb-3">
             <label>Student ID</label>

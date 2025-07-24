@@ -63,7 +63,7 @@
     // Route::get('/student/register', [StudentAuthController::class, 'showRegisterForm'])->name('student.register');
     // Route::post('/student/register', [StudentAuthController::class, 'register'])->name('student.register.submit');
 
-    Route::post('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
+ 
 
 
     /*
@@ -137,7 +137,8 @@
         //Route::get('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
             // NOTE: The duplicate GET route for 'student.logout' has been removed from here.
 
-
+        Route::get('/student/logout', [StudentAuthController::class, 'logout'])->name('student.logout');
+        
         // Change Password
         Route::get('/student/change-password', [StudentAuthController::class, 'showChangePasswordForm'])->name('student.change.password.form');
         Route::post('/student/change-password', [StudentAuthController::class, 'changePassword'])->name('student.change.password');
